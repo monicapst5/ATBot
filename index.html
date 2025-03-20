@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATbot</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 0;
+            height: 100vh;
+            background-image: url('imagenes/mesa.jpg');
+            background-size: cover;
+            background-position: center;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #chatbox { 
+            width: 320px; 
+            height: 550px; 
+            border: 1px solid #ccc; 
+            overflow-y: auto; 
+            margin: 20px auto; 
+            padding: 10px; 
+            background-image: url('imagenes/fondochat.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .message { 
+            padding: 8px; 
+            margin: 5px; 
+            border-radius: 5px; 
+        }
+        
+        .user { 
+            background-color: #daf8cb; 
+            text-align: right; 
+        }
+        
+        .bot { 
+            background-color: #f1f1f1; 
+            text-align: left; 
+        }
+        
+        button { 
+            margin: 5px; 
+            padding: 10px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            background-color: #007bff; 
+            color: white; 
+        }
+        
+        button:hover { 
+            background-color: #0056b3; 
+        }
+    </style>
+</head>
+<body>
+
+    <div id="chatbox">
+        <div class="message bot">🤖 ATbot: ¿Eres alumno o profesor?</div>
+    </div>
+
+    <div id="buttons">
+        <button onclick="selectRole('alumno')">🎓 Alumno</button>
+        <button onclick="selectRole('profesor')">👨‍🏫 Profesor</button>
+    </div>
+
+    <script>
+        function addMessage(sender, text) {
+            const chatbox = document.getElementById("chatbox");
+            let message = document.createElement("div");
+            message.className = "message " + sender;
+            message.innerText = text;
+            chatbox.appendChild(message);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        function clearButtons() {
+            document.getElementById("buttons").innerHTML = "";
+        }
+
+        function showRestartButton() {
+            document.getElementById("buttons").innerHTML = `
+                <button onclick="createTicket()">📩 Crear un ticket</button>
+				<button onclick="restartChat()">🔄 Volver al inicio</button>
+            `;
+        }
+
+        function restartChat() {
+            location.reload();
+        }
+
+        function createTicket() {
+			window.open("https://jira.unir.net/servicedesk/customer/portal/1", "_blank");
+        }
+
+        function selectRole(role) {
+            clearButtons();
+            addMessage("user", role === "alumno" ? "🎓 Alumno" : "👨‍🏫 Profesor");
+
+            setTimeout(() => {
+                addMessage("bot", "¿Qué problema tienes? Selecciona una de las opciones");
+                let buttonsHTML = `
+                    <button onclick="selectIssue('acceso', '${role}')">🔑 No puedo acceder a la plataforma</button>
+                    <button onclick="selectIssue('grabaciones', '${role}')">📹 No veo las clases grabadas</button>
+					<button onclick="selectIssue('notasFinales', '${role}')">📊 Diferentes notas en calificaciones y calificaciones finales</button>
+					<button onclick="selectIssue('testIncompletos', '${role}')">✍️ No califica los test completamente</button>
+					<button onclick="selectIssue('foro', '${role}')">💬 No deja responder en el foro</button>
+					<button onclick="selectIssue('dudasHorario', '${role}')">🕰️ Dudas sobre la hora de clases</button>
+					<button onclick="selectIssue('asistencias', '${role}')">✅ No puntúa las asistencias correctamente</button>
+					<button onclick="selectIssue('biblioteca', '${role}')">📚 Problemas con la biblioteca</button>
+					<button onclick="selectIssue('turnitin', '${role}')">📑 Turnitin muestra error al enviar el fichero</button>
+
+                `;
+                if (role === "profesor") {
+                    buttonsHTML += `<button onclick="selectIssue('notas', '${role}')">📝 No puedo importar notas</button>`;
+					buttonsHTML += `<button onclick="selectIssue('contactoTAP', '${role}')">📞 Contacto de TAP</button>`;
+					buttonsHTML += `<button onclick="selectIssue('calificarAsistencias', '${role}')">📅 No me deja calificar asistencias</button>`;
+					buttonsHTML += `<button onclick="selectIssue('todos10', '${role}')">🎓 Todos los alumnos salen con un 10</button>`;
+					buttonsHTML += `<button onclick="selectIssue('sacarAlumnosTF', '${role}')">🚫 Se deben sacar alumnos de un TF grupal</button>`;
+					buttonsHTML += `<button onclick="selectIssue('unificarUsuarios', '${role}')">🔄 Quiero unificar mis usuarios</button>`;
+					buttonsHTML += `<button onclick="selectIssue('rubricaNoTrasladaNota', '${role}')">📋 Rúbrica no traslada la nota</button>`;
+					buttonsHTML += `<button onclick="selectIssue('necesitoVPN', '${role}')">🌐 Necesito VPN</button>`;
+					buttonsHTML += `<button onclick="selectIssue('subirArchivoForo', '${role}')">📂 No me deja subir archivo en el foro</button>`;
+					buttonsHTML += `<button onclick="selectIssue('errorFirmarActas', '${role}')">📝 Error al firmar actas</button>`;
+					buttonsHTML += `<button onclick="selectIssue('noSumaECEXT', '${role}')">📊 No suma la EC en EXT</button>`;
+					buttonsHTML += `<button onclick="selectIssue('subirArchivoTurnitin', '${role}')">📑 No me deja subir archivos en Turnitin</button>`;
+					buttonsHTML += `<button onclick="selectIssue('noAccesoTurnitin', '${role}')">🔒 No puedo acceder a Turnitin</button>`;
+					buttonsHTML += `<button onclick="selectIssue('anunciosForosTachados', '${role}')">📰 Los anuncios/foros salen tachados</button>`;
+					buttonsHTML += `<button onclick="selectIssue('noImportaNotasPracticas', '${role}')">📋 No se importan las notas de prácticas</button>`;
+					buttonsHTML += `<button onclick="selectIssue('notasFinalesSinDecimales', '${role}')">🔢 Notas finales sin decimales</button>`;
+					buttonsHTML += `<button onclick="selectIssue('notaFinalNoHaceMedia', '${role}')">⚖️ Nota final no hace la media</button>`;
+                }
+				else if (role === "alumno") {
+                    buttonsHTML += `<button onclick="selectIssue('noDeposito', '${role}')">📝 No puedo depositar</button>`;
+					buttonsHTML += `<button onclick="selectIssue('smowl', '${role}')">🖥️ SMOWL no abre</button>`;
+					buttonsHTML += `<button onclick="selectIssue('mentora', '${role}')">📞 Mi mentora no responde</button>`;
+					buttonsHTML += `<button onclick="selectIssue('foroTemas', '${role}')">📌 No me deja ver los temas en el foro</button>`;
+					buttonsHTML += `<button onclick="selectIssue('office', '${role}')">📄 No puedo acceder a Office</button>`;
+					buttonsHTML += `<button onclick="selectIssue('solicitudPracticas', '${role}')">📝 No puedo entregar solicitud de prácticas</button>`;
+                }
+                document.getElementById("buttons").innerHTML = buttonsHTML;
+            }, 500);
+        }
+
+        function selectIssue(issue, role) {
+            clearButtons();
+            let issueText = {
+                "acceso": "🔑 No puedo acceder",
+                "grabaciones": "📹 No veo las clases grabadas",
+                "notas": "📝 No puedo importar notas",
+				"noDeposito": "📝 No puedo depositar",
+				"smowl": "🖥️ SMOWL no abre",
+				"mentora": "📞 Mi mentora no responde",
+				"foroTemas": "📌 No me deja ver los temas en el foro",
+				"office": "📄 No puedo acceder a Office",
+				"solicitudPracticas": "📝 No puedo entregar solicitud de prácticas",
+				"notasFinales": "📊 Diferentes notas en calificaciones y calificaciones finales",
+				"testIncompletos": "✍️ No califica los test completamente",
+				"foro": "💬 No deja responder en el foro",
+				"dudasHorario": "🕰️ Dudas sobre la hora de clases",
+				"asistencias": "✅ No puntúa las asistencias correctamente",
+				"biblioteca": "📚 Problemas con la biblioteca",
+				"turnitin": "📑 Turnitin muestra error al enviar el fichero",
+				"contactoTAP": "📞 Contacto de TAP",
+				"calificarAsistencias": "📅 No me deja calificar asistencias",
+				"todos10": "🎓 Todos los alumnos salen con un 10",
+				"sacarAlumnosTF": "🚫 Se deben sacar alumnos de un TF grupal",
+				"unificarUsuarios": "🔄 Quiero unificar mis usuarios",
+				"rubricaNoTrasladaNota": "📋 Rúbrica no traslada la nota",
+				"necesitoVPN": "🌐 Necesito VPN",
+				"subirArchivoForo": "📂 No me deja subir archivo en el foro",
+				"errorFirmarActas": "📝 Error al firmar actas",
+				"noSumaECEXT": "📊 No suma la EC en EXT",
+				"subirArchivoTurnitin": "📑 No me deja subir archivos en Turnitin",
+				"noAccesoTurnitin": "🔒 No puedo acceder a Turnitin",
+				"anunciosForosTachados": "📰 Los anuncios/foros salen tachados",
+				"noImportaNotasPracticas": "📋 No se importan las notas de prácticas",
+				"notasFinalesSinDecimales": "🔢 Notas finales sin decimales",
+				"notaFinalNoHaceMedia": "⚖️ Nota final no hace la media"
+            };
+            addMessage("user", issueText[issue]);
+
+            setTimeout(() => {
+                if (issue === "grabaciones") {
+                    addMessage("bot", "Intenta filtrando por intervalo de fechas. Si aún no las ves, crea un ticket en jira indicando el enlace del aula afectada.");
+                    showRestartButton();
+                } else if (issue === "acceso") {
+                    addMessage("bot", "¿Qué error te aparece al tratar de acceder?");
+                    document.getElementById("buttons").innerHTML = `
+                        <button onclick="accessIssue('credenciales')">🔑 Credenciales incorrectas</button>
+                        <button onclick="accessIssue('usuario_no_activo')">🚫 Usuario no activo</button>
+                        <button onclick="accessIssue('sin_permisos')">❌ No tienes permiso en la plataforma</button>
+                    `;
+                } else if (issue === "notas") {
+                    addMessage("bot", "Las notas se deben importar tras 10 días de la fecha fin del aula. En caso de haber pasado los días indicados, crea un ticket en jira indicando el enlace del aula afectada.");
+                    showRestartButton();
+                } else if (issue === "noDeposito") {
+                    addMessage("bot", "Debes contactar con tu director quien te podrá ayudar al respecto. Si no responde puedes crear un ticket.");
+                    document.getElementById("buttons").innerHTML = `
+                        <button onclick="restartChat()">🔄 Volver al inicio</button>
+                    `;
+                } else if (issue === "smowl") {
+                    addMessage("bot", "Debes actualizar a la versión 5 desinstalando la versión antigua y volviendo a instalar la nueva.");
+                    showRestartButton();
+                } else if (issue === "mentora") {
+                    addMessage("bot", "Puedes contactar llamando al teléfono 941 610 026.");
+					document.getElementById("buttons").innerHTML = `
+                        <button onclick="restartChat()">🔄 Volver al inicio</button>
+                    `;
+                } else if (issue === "solicitudPracticas") {
+                    addMessage("bot", "Se debe seleccionar la fecha en el calendario que aparece al final del formulario. Si el problema es con el teléfono, se debe añadir la extensión, por ejemplo +34. Y para filtrar por país puede encontrarse escribiendo ESP. Para cualquier otra duda debe contactar con su gestor de prácticas.");
+					document.getElementById("buttons").innerHTML = `
+                        <button onclick="restartChat()">🔄 Volver al inicio</button>
+                    `;
+                } else if (issue === "foroTemas") {
+                    addMessage("bot", "Se debe filtrar por los diferentes grupos que dispone.");
+                    showRestartButton();
+                } else if (issue === "office") {
+                    addMessage("bot", "Te recomendamos acceder desde office.com.");
+                    showRestartButton();
+                } else if (issue === "biblioteca") {
+                    addMessage("bot", "Se debe trasladar el caso a biblioteca.virtual@unir.net .");
+					document.getElementById("buttons").innerHTML = `
+                        <button onclick="restartChat()">🔄 Volver al inicio</button>
+                    `;
+                } else if (issue === "notasFinales") {
+                    addMessage("bot", "La nota correcta es la que aparece en calificaciones finales ya que en calificaciones es la ponderacion de lo obtenido respecto a lo entregado, además suma hasta las tareas suspensas.");
+                    showRestartButton();
+                } else if (issue === "testIncompletos") {
+                    addMessage("bot", "Se deben seleccionar todas las respuestas correctas en los test de multirespuesta.");
+                    showRestartButton();
+                } else if (issue === "foro") {
+                    addMessage("bot", " Se debe contactar con el docente para modificar el supergrupo.");
+                    showRestartButton();
+                } else if (issue === "dudasHorario") {
+                    addMessage("bot", "El calendario muestra la hora configurada por el usuario, pero la herramienta de clases está en la hora de España.");
+                    showRestartButton();
+                } else if (issue === "asistencias") {
+                    addMessage("bot", "El docente debe fijar la duración de las clases, ya que puede suceder que se quede la sala abierta.");
+                    showRestartButton();
+                } else if (issue === "turnitin") {
+                    addMessage("bot", "La entrega está correcta, pero algunos ficheros no son válidos para revisión, tan solo se revisan los .pdf y .doc.");
+                    showRestartButton();
+                } else if (issue === "sacarAlumnosTF") {
+                    addMessage("bot", "Lo realizan desde coordinación académica.");
+					document.getElementById("buttons").innerHTML = `
+                        <button onclick="restartChat()">🔄 Volver al inicio</button>
+                    `;
+                } else if (issue === "unificarUsuarios") {
+                    addMessage("bot", "No se deben unificar el de alumno y docente en el mismo perfil.");
+					document.getElementById("buttons").innerHTML = `
+                        <button onclick="restartChat()">🔄 Volver al inicio</button>
+                    `;
+                } else if (issue === "rubricaNoTrasladaNota") {
+                    addMessage("bot", "La rúbrica es una guía de la corrección, pero se debe trasladar la suma manualmente.");
+					document.getElementById("buttons").innerHTML = `
+                        <button onclick="restartChat()">🔄 Volver al inicio</button>
+                    `;
+                } else if (issue === "necesitoVPN") {
+                    addMessage("bot", "Se debe trasladar el caso a biblioteca.virtual@unir.net .");
+					document.getElementById("buttons").innerHTML = `
+                        <button onclick="restartChat()">🔄 Volver al inicio</button>
+                    `;
+                } else if (issue === "noImportaNotasPracticas") {
+                    addMessage("bot", "Se debe trasladar a Facility.");
+					document.getElementById("buttons").innerHTML = `
+                        <button onclick="restartChat()">🔄 Volver al inicio</button>
+                    `;
+                } else if (issue === "contactoTAP") {
+                    addMessage("bot", "Debes contactar mediante correo, o al teléfono que aparece en la firma de respuesta de su correo de bienvenida.");
+                    showRestartButton();
+                } else if (issue === "calificarAsistencias") {
+                    addMessage("bot", "Se debe revisar si están en la programación semanal y si no está y debe estarlo, se debe crear un ticket a contenidos.");
+                    showRestartButton();
+                } else if (issue === "todos10") {
+                    addMessage("bot", "Las tareas se configuran con un colchón de 15 puntos. Debes crear un JIRA si ves discrepancias en la suma.");
+                    showRestartButton();
+                } else if (issue === "subirArchivoForo") {
+                    addMessage("bot", "Posiblemente hayas llegado a la capacidad de usuario máxima, se deben eliminar archivos.");
+                    showRestartButton();
+                } else if (issue === "errorFirmarActas") {
+                    addMessage("bot", "Se debe restablecer la clave de fuente primaria.");
+                    showRestartButton();
+                } else if (issue === "noSumaECEXT") {
+                    addMessage("bot", "Se debe revisar que no fuese práctica deshonesta en ORD.");
+                    showRestartButton();
+                } else if (issue === "subirArchivoTurnitin") {
+                    addMessage("bot", "Se debe subir con entrega rápida, su TAP le puede hacer llegar un manual.");
+                    showRestartButton();
+                } else if (issue === "noAccesoTurnitin") {
+                    addMessage("bot", "Se debe solicitar un correo en He olvidado contraseña y en caso de no llegar dicho mail se debe poner un ticket.");
+                    showRestartButton();
+                } else if (issue === "anunciosForosTachados") {
+                    addMessage("bot", "Se debe revisar si existe alguno creado. Si los hay creados, se debe crear un ticket.");
+                    showRestartButton();
+                } else if (issue === "notasFinalesSinDecimales") {
+                    addMessage("bot", "Se debe revisar que no esté sobrescrita la nota.");
+                    showRestartButton();
+                } else if (issue === "notaFinalNoHaceMedia") {
+                    addMessage("bot", "Si la EC es obligatoria y está suspensa, no hará la media de ambas notas.");
+                    showRestartButton();
+                } 
+            }, 500);
+        }
+
+        function accessIssue(type) {
+            clearButtons();
+            let issueText = {
+                "credenciales": "🔑 Credenciales incorrectas",
+                "usuario_no_activo": "🚫 Usuario no activo",
+                "sin_permisos": "❌ No tienes permisos"
+            };
+            addMessage("user", issueText[type]);
+
+            setTimeout(() => {
+                if (type === "credenciales") {
+                    addMessage("bot", "Haz clic en el siguiente enlace para recuperar tu contraseña:");
+                    document.getElementById("buttons").innerHTML = `
+                        <button onclick="window.open('https://crosscutting.unir.net/forgot?returnUrl=%2Fauthorize%3Fclient_id%3Dmoodle.unir%26response_type%3Dcode%26redirect_uri%3Dhttps%253A%252F%252Fcampusonline.unir.net%252Fadmin%252Foauth2callback.php%26state%3D%252Fauth%252Foauth2%252Flogin.php%253Fwantsurl%253Dhttps%25253A%25252F%25252Fcampusonline.unir.net%25252Fmod%25252Fpage%25252Fview.php%25253Fid%25253D297281%2526sesskey%253DcKJvMhLDKP%2526id%253D3%26scope%3Demail%2520username', '_blank')">🔗 Recuperar contraseña</button>
+                        <button onclick="restartChat()">🔄 Volver al inicio</button>
+                    `;
+                } else if (type === "usuario_no_activo") {
+                    addMessage("bot", "Esto es debido a que se ha solicitado un cambio de clave que no ha sido finalizado o que se han introducido varias veces las claves incorrectamente. Haz clic en el siguiente enlace para recuperar tu contraseña:");
+                    document.getElementById("buttons").innerHTML = `
+                        <button onclick="window.open('https://crosscutting.unir.net/forgot?returnUrl=%2Fauthorize%3Fclient_id%3Dmoodle.unir%26response_type%3Dcode%26redirect_uri%3Dhttps%253A%252F%252Fcampusonline.unir.net%252Fadmin%252Foauth2callback.php%26state%3D%252Fauth%252Foauth2%252Flogin.php%253Fwantsurl%253Dhttps%25253A%25252F%25252Fcampusonline.unir.net%25252Fmod%25252Fpage%25252Fview.php%25253Fid%25253D297281%2526sesskey%253DcKJvMhLDKP%2526id%253D3%26scope%3Demail%2520username', '_blank')">🔗 Recuperar contraseña</button>
+                        <button onclick="restartChat()">🔄 Volver al inicio</button>
+                    `;
+                } else if (type === "sin_permisos") {
+                    addMessage("bot", "Debes acceder desde la página inicial de la universidad, en el apartado ACCESO ESTUDIANTES. En caso de continuar con la incidencia puedes crear un ticket, por favor detalla lo que sucede adjuntando capturas");
+                    document.getElementById("buttons").innerHTML = `
+                        <button onclick="window.open('https://www.unir.net/', '_blank')">🏫 Ir a UNIR</button>
+						<button onclick="createTicket()">📩 Crear un ticket</button>
+                        <button onclick="restartChat()">🔄 Volver al inicio</button>
+                    `;
+                }
+            }, 500);
+        }
+    </script>
+
+</body>
+</html>
